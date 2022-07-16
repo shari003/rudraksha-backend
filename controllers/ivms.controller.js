@@ -2,7 +2,7 @@ const ivmsModel = require("../models/ivms.model");
 const _ = require("lodash");
 
 async function addToIVMS(req, res, next){
-    const {middlename, fathername, mothername, dob, educationalStatus, professionalSector, degree, emailId, phoneNo, address, role, startDate, endDate, stipend, panCard, aadharCard} = req.body;
+    const {middlename, fathername, mothername, dob, educationalStatus, gender, professionalSector, degree, emailId, phoneNo, address, role, startDate, endDate, stipend, panCard, aadharCard} = req.body;
 
     const firstname = _.startCase(req.body.firstname);
     let mName = _.startCase(middlename);
@@ -10,7 +10,7 @@ async function addToIVMS(req, res, next){
     const dad = _.startCase(fathername);
     const mom = _.startCase(mothername);
 
-    if(!middlename || !fathername || !mothername || !dob || !educationalStatus || !degree || !professionalSector || !emailId || !phoneNo || !address || !role || !startDate || !endDate || !stipend ){
+    if(!middlename || !fathername || !mothername || !gender || !dob || !educationalStatus || !degree || !professionalSector || !emailId || !phoneNo || !address || !role || !startDate || !endDate || !stipend ){
         throw new Error("Please Provide all the necessary fields !!");
     }
 

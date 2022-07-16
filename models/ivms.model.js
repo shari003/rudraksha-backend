@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const ivmsSchema = new mongoose.Schema({
     firstname: {
         type: String
-    },
+    }, 
     middlename: {
         type: String,
         required: [true, "Please Provide your middle name !"]
@@ -12,7 +12,8 @@ const ivmsSchema = new mongoose.Schema({
         type: String,
     },
     gender: {
-        type: String
+        type: String,
+        enum: ["F", "M"],
     },
     fathername: {
         type: String,
@@ -92,6 +93,6 @@ const ivmsSchema = new mongoose.Schema({
     }
 }, {timestamps: true});
 
-const ivmsModel = mongoose.model("IVMS", ivmsSchema);
+const ivmsModel = mongoose.model("IVMS master table", ivmsSchema);
 
 module.exports = ivmsModel;
