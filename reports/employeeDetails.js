@@ -32,7 +32,7 @@ router.get("/reports-designation-employee", onlyAdmin, async (req, res) => {
         // console.log(e);
         res.status(500).json({
             success: false,
-            data: e,
+            data: "Something went wrong !!",
             message: "Something went wrong !!"
         });
     }
@@ -1168,7 +1168,7 @@ router.post("/reports-yearly-allEmployees", async(req, res) => {
         const leaves = await Leaves.find({ status: "Approved" });
         if (leaves.length !== 0) {
             for (let j = 0; j < leaves.length; j++) {
-                if(leaves[j].from.getFullYear() === year){
+                if(leaves[j].from.getFullYear() == year){
                     if (leaves[j].typeOfLeave === "casual leave") {
                         lvs.CL += (leaves[j].to - leaves[j].from) / (1000 * 3600 * 24);
                     }

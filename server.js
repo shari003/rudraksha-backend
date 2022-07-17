@@ -40,6 +40,7 @@ app.use("/api/ivms", require("./routes/ivms.routes"));
 
 // reports apis
 app.use("/api/reports", require("./reports/employeeDetails"));
+app.use("/api/reports", require("./reports/ivms.reports"));
 
 const ConnectDB = require("./database/connection");
 //connection to db
