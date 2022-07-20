@@ -2,14 +2,15 @@ const mongoose = require('mongoose');
 
 const ivmsSchema = new mongoose.Schema({
     firstname: {
-        type: String
+        type: String,
+        required: [true, "Please Provide your first name !"]
     }, 
     middlename: {
         type: String,
-        required: [true, "Please Provide your middle name !"]
     },
     lastname: {
         type: String,
+        required: [true, "Please Provide your last name !"]
     },
     gender: {
         type: String,
@@ -56,7 +57,7 @@ const ivmsSchema = new mongoose.Schema({
     role: {
         type: String,
         enum: {
-            values: ['Intern', 'Volunteer'],
+            values: ['Intern', 'Volunteer', 'Advisor'],
             message: '{VALUE} is not supported'
           }
     },
