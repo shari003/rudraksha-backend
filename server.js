@@ -37,6 +37,7 @@ app.use("/api/attendance", attendanceRoutes);
 app.use("/api/lms", leaveRoutes);
 //http://localhost:5000/api/employees/getEmployees
 app.use("/api/ivms", require("./routes/ivms.routes"));
+app.use("/api/nms", require("./routes/nms-empTrack.routes"));
 
 // reports apis
 app.use("/api/reports", require("./reports/employeeDetails"));

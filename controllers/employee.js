@@ -1,6 +1,8 @@
 const Employee = require("../models/employee");
 const Attendance = require("../models/attendance");
 const Lms = require("../models/Lms");
+const empTrackModel = require("../models/nms-empTrack.model");
+
 const schedule = require("node-schedule");
 const fs = require("fs");
 const path = require("path");
@@ -39,9 +41,19 @@ const AddEmployee = async (req, res, next) => {
     await emp.save();
     
     // console.log(req.body.gender);
+    const doj = new Date(emp.createdAt);
+    /////////////////////////////////////////////////////////
+    // creating a tracker instance for each employee
+    const newTracker = new empTrackModel({
+      empId: emp._id,
+      currentDate: doj
+    });
+
+    const saveTracker = await newTracker.save();
+    console.log(saveTracker);
+    /////////////////////////////////////////////////////////
 
     // creating a lms instance for each employee
-    const doj = new Date(emp.createdAt);
     const remCausalLeaves = 12 - (doj.getMonth() + 1);
     const lms = new Lms({
       empId: emp._id,
