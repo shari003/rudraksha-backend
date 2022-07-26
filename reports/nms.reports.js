@@ -16,37 +16,39 @@ router.post("reports-monthly-nms", async(req, res) => {
         let final = [];
         let vols = [];
 
-        if(volunteers.length !== 0){
+        if(volunteers.length > 0){
             for(let i = 0; i < volunteers.length; i++){
                 if(volunteers[i].volStartDate.getMonth() === Number(month) && volunteers[i].volStartDate.getFullYear() === Number(year)){
                     vols.push(volunteers[i]);
                 }
             }
         }
-        
-        for(let i = 0; i < oneEmp.monthlyStatus.length; i++){
-            if(oneEmp.monthlyStatus[i].for.getMonth() === Number(month) && oneEmp.monthlyStatus[i].for.getFullYear() === Number(year)){
-                mnth = oneEmp.monthlyStatus[i].for.toLocaleString('default', { month: 'long' });
-                final.push({label: mnth, value: oneEmp.monthlyStatus[i].count, color: "#D61C4E"});
 
-                res.status(200).json({
-                    success: true,
-                    data: {
-                        final,
-                        vols
-                    },
-                    message: "Data Fetched for month: " + mnth + " ,for ID: " + empId
-                });
-
-                return -1;
-            
-            } else {
-                res.status(200).json({
-                    success: true,
-                    data: "No Records Found for the month: " + month,
-                    message: "Please try again with different Month !!"
-                });
-                return -1;
+        if(oneEmp.monthlyStatus.length > 0){
+            for(let i = 0; i < oneEmp.monthlyStatus.length; i++){
+                if(oneEmp.monthlyStatus[i].for.getMonth() === Number(month) && oneEmp.monthlyStatus[i].for.getFullYear() === Number(year)){
+                    mnth = oneEmp.monthlyStatus[i].for.toLocaleString('default', { month: 'long' });
+                    final.push({label: mnth, value: oneEmp.monthlyStatus[i].count, color: "#D61C4E"});
+    
+                    res.status(200).json({
+                        success: true,
+                        data: {
+                            final,
+                            vols
+                        },
+                        message: "Data Fetched for month: " + mnth + " ,for ID: " + empId
+                    });
+    
+                    return -1;
+                
+                } else {
+                    res.status(200).json({
+                        success: true,
+                        data: "No Records Found for the month: " + (Number(month) + 1),
+                        message: "Please try again with different Month !!"
+                    });
+                    return -1;
+                }
             }
         }
 
@@ -88,7 +90,7 @@ router.post("reports-quarterly-nms", async(req, res) => {
         const volunteers = await volModel.find({empId: empId});
         if(!oneEmp) throw new Error("No Track Record Exists for Employee with ID: " + empId);
         let vols = [];
-        if(volunteers.length !== 0){
+        if(volunteers.length > 0){
             for(let i = 0; i < volunteers.length; i++){
                 if(Number(quarter) === 0){
                     if((volunteers[i].volStartDate.getMonth() === 0 || volunteers[i].volStartDate.getMonth() === 1 || volunteers[i].volStartDate.getMonth() === 2 || volunteers[i].volStartDate.getMonth() === 3) && volunteers[i].volStartDate.getFullYear() === Number(year)){
@@ -108,46 +110,48 @@ router.post("reports-quarterly-nms", async(req, res) => {
             }   
         }
 
-        for(let i = 0; i < oneEmp.monthlyStatus.length; i++){
-            if(Number(quarter) === 0){
-
-                if((oneEmp.monthlyStatus[i].for.getMonth() === 0 || oneEmp.monthlyStatus[i].for.getMonth() === 1 || oneEmp.monthlyStatus[i].for.getMonth() === 2 || oneEmp.monthlyStatus[i].for.getMonth() === 3) && (oneEmp.monthlyStatus[i].getFullYear() === Number(year))){
-
-                    let mnth = oneEmp.monthlyStatus[i].for.toLocaleString('default', { month: 'long' });
-                    if(mnth in quarter0){
-                        quarter0[mnth] += oneEmp.monthlyStatus[i].count;
+        if(oneEmp.monthlyStatus.length > 0){
+            for(let i = 0; i < oneEmp.monthlyStatus.length; i++){
+                if(Number(quarter) === 0){
+    
+                    if((oneEmp.monthlyStatus[i].for.getMonth() === 0 || oneEmp.monthlyStatus[i].for.getMonth() === 1 || oneEmp.monthlyStatus[i].for.getMonth() === 2 || oneEmp.monthlyStatus[i].for.getMonth() === 3) && (oneEmp.monthlyStatus[i].getFullYear() === Number(year))){
+    
+                        let mnth = oneEmp.monthlyStatus[i].for.toLocaleString('default', { month: 'long' });
+                        if(mnth in quarter0){
+                            quarter0[mnth] += oneEmp.monthlyStatus[i].count;
+                        }
+    
                     }
-
+    
                 }
-
-            }
-
-            if(Number(quarter) === 1){
-
-                if((oneEmp.monthlyStatus[i].for.getMonth() === 4 || oneEmp.monthlyStatus[i].for.getMonth() === 5 || oneEmp.monthlyStatus[i].for.getMonth() === 6 || oneEmp.monthlyStatus[i].for.getMonth() === 7) && (oneEmp.monthlyStatus[i].getFullYear() === Number(year))){
-
-                    let mnth = oneEmp.monthlyStatus[i].for.toLocaleString('default', { month: 'long' });
-                    if(mnth in quarter1){
-                        quarter1[mnth] += oneEmp.monthlyStatus[i].count;
+    
+                if(Number(quarter) === 1){
+    
+                    if((oneEmp.monthlyStatus[i].for.getMonth() === 4 || oneEmp.monthlyStatus[i].for.getMonth() === 5 || oneEmp.monthlyStatus[i].for.getMonth() === 6 || oneEmp.monthlyStatus[i].for.getMonth() === 7) && (oneEmp.monthlyStatus[i].getFullYear() === Number(year))){
+    
+                        let mnth = oneEmp.monthlyStatus[i].for.toLocaleString('default', { month: 'long' });
+                        if(mnth in quarter1){
+                            quarter1[mnth] += oneEmp.monthlyStatus[i].count;
+                        }
+    
                     }
-
+    
                 }
-
-            }
-
-            if(Number(quarter) === 2){
-
-                if((oneEmp.monthlyStatus[i].for.getMonth() === 8 || oneEmp.monthlyStatus[i].for.getMonth() === 8 || oneEmp.monthlyStatus[i].for.getMonth() === 10 || oneEmp.monthlyStatus[i].for.getMonth() === 11) && (oneEmp.monthlyStatus[i].getFullYear() === Number(year))){
-
-                    let mnth = oneEmp.monthlyStatus[i].for.toLocaleString('default', { month: 'long' });
-                    if(mnth in quarter2){
-                        quarter2[mnth] += oneEmp.monthlyStatus[i].count;
+    
+                if(Number(quarter) === 2){
+    
+                    if((oneEmp.monthlyStatus[i].for.getMonth() === 8 || oneEmp.monthlyStatus[i].for.getMonth() === 8 || oneEmp.monthlyStatus[i].for.getMonth() === 10 || oneEmp.monthlyStatus[i].for.getMonth() === 11) && (oneEmp.monthlyStatus[i].getFullYear() === Number(year))){
+    
+                        let mnth = oneEmp.monthlyStatus[i].for.toLocaleString('default', { month: 'long' });
+                        if(mnth in quarter2){
+                            quarter2[mnth] += oneEmp.monthlyStatus[i].count;
+                        }
+    
                     }
-
+    
                 }
-
+    
             }
-
         }
 
         let final = [];
@@ -255,7 +259,7 @@ router.post("reports-halfYearly-nms", async(req, res) => {
         if(!oneEmp) throw new Error("No Track Record Exists for Employee with ID: " + empId);
         let vols = [];
 
-        if(volunteers.length !== 0){
+        if(volunteers.length > 0){
             for(let i = 0; i < volunteers.length; i++){
                 if(Number(half) === 0){
                     if(volunteers[i].volStartDate.getMonth() === 0 || volunteers[i].volStartDate.getMonth() === 1 || volunteers[i].volStartDate.getMonth() === 2 || volunteers[i].volStartDate.getMonth() === 3 || volunteers[i].volStartDate.getMonth() === 4 || volunteers[i].volStartDate.getMonth() === 5){
@@ -270,33 +274,35 @@ router.post("reports-halfYearly-nms", async(req, res) => {
             }
         }
 
-        for(let i = 0; i < oneEmp.monthlyStatus.length; i++){
-            if(Number(half) === 0){
-
-                if((oneEmp.monthlyStatus[i].for.getMonth() === 0 || oneEmp.monthlyStatus[i].for.getMonth() === 1 || oneEmp.monthlyStatus[i].for.getMonth() === 2 || oneEmp.monthlyStatus[i].for.getMonth() === 3 || oneEmp.monthlyStatus[i].for.getMonth() === 4 || oneEmp.monthlyStatus[i].for.getMonth() === 5) && (oneEmp.monthlyStatus[i].getFullYear() === Number(year))){
-
-                    let mnth = oneEmp.monthlyStatus[i].for.toLocaleString('default', { month: 'long' });
-                    if(mnth in half0){
-                        half0[mnth] += oneEmp.monthlyStatus[i].count;
+        if(oneEmp.monthlyStatus.length > 0){
+            for(let i = 0; i < oneEmp.monthlyStatus.length; i++){
+                if(Number(half) === 0){
+    
+                    if((oneEmp.monthlyStatus[i].for.getMonth() === 0 || oneEmp.monthlyStatus[i].for.getMonth() === 1 || oneEmp.monthlyStatus[i].for.getMonth() === 2 || oneEmp.monthlyStatus[i].for.getMonth() === 3 || oneEmp.monthlyStatus[i].for.getMonth() === 4 || oneEmp.monthlyStatus[i].for.getMonth() === 5) && (oneEmp.monthlyStatus[i].getFullYear() === Number(year))){
+    
+                        let mnth = oneEmp.monthlyStatus[i].for.toLocaleString('default', { month: 'long' });
+                        if(mnth in half0){
+                            half0[mnth] += oneEmp.monthlyStatus[i].count;
+                        }
+    
                     }
-
+    
                 }
-
-            }
-
-            if(Number(half) === 1){
-
-                if((oneEmp.monthlyStatus[i].for.getMonth() === 6 || oneEmp.monthlyStatus[i].for.getMonth() === 7 || oneEmp.monthlyStatus[i].for.getMonth() === 8 || oneEmp.monthlyStatus[i].for.getMonth() === 9 || oneEmp.monthlyStatus[i].for.getMonth() === 10 || oneEmp.monthlyStatus[i].for.getMonth() === 11) && (oneEmp.monthlyStatus[i].getFullYear() === Number(year))){
-
-                    let mnth = oneEmp.monthlyStatus[i].for.toLocaleString('default', { month: 'long' });
-                    if(mnth in half1){
-                        half1[mnth] += oneEmp.monthlyStatus[i].count;
+    
+                if(Number(half) === 1){
+    
+                    if((oneEmp.monthlyStatus[i].for.getMonth() === 6 || oneEmp.monthlyStatus[i].for.getMonth() === 7 || oneEmp.monthlyStatus[i].for.getMonth() === 8 || oneEmp.monthlyStatus[i].for.getMonth() === 9 || oneEmp.monthlyStatus[i].for.getMonth() === 10 || oneEmp.monthlyStatus[i].for.getMonth() === 11) && (oneEmp.monthlyStatus[i].getFullYear() === Number(year))){
+    
+                        let mnth = oneEmp.monthlyStatus[i].for.toLocaleString('default', { month: 'long' });
+                        if(mnth in half1){
+                            half1[mnth] += oneEmp.monthlyStatus[i].count;
+                        }
+    
                     }
-
+    
                 }
-
+    
             }
-
         }
 
         let final = [];
@@ -379,7 +385,7 @@ router.post("reports-yearly-nms", async(req, res) => {
             "December": 0
         }
 
-        if(volunteers.length !== 0){
+        if(volunteers.length > 0){
             for(let i = 0; i < volunteers.length; i++){
                 if(volunteers[i].volStartDate.getFullYear() === Number(year)){
                     vols.push(volunteers[i]);
@@ -387,11 +393,13 @@ router.post("reports-yearly-nms", async(req, res) => {
             }
         }
 
-        for(let i = 0; i < oneEmp.monthlyStatus.length; i++){
-            if(oneEmp.monthlyStatus[i].for.getFullYear() === Number(year)){
-                let mnth = oneEmp.monthlyStatus[i].for.toLocaleString('default', { month: 'long' });
-                if(mnth in months){
-                    months[mnth] += oneEmp.monthlyStatus[i].count;
+        if(oneEmp.monthlyStatus.length > 0){
+            for(let i = 0; i < oneEmp.monthlyStatus.length; i++){
+                if(oneEmp.monthlyStatus[i].for.getFullYear() === Number(year)){
+                    let mnth = oneEmp.monthlyStatus[i].for.toLocaleString('default', { month: 'long' });
+                    if(mnth in months){
+                        months[mnth] += oneEmp.monthlyStatus[i].count;
+                    }
                 }
             }
         }
