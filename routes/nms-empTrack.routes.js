@@ -87,18 +87,20 @@ schedule.scheduleJob("0 0 * * *", async () => {
                     }, {new: true, runValidators: true});
 
                 } else {
-
-                    let recentTime = allTracks[i].monthlyStatus[0].for.getTime();
+ 
+                    let recentTime = new Date(allTracks[i].monthlyStatus[0].for).getTime();
 
                     for(let j = 1; i < allTracks[i].monthlyStatus.length; j++){
-                        if(allTracks[i].monthlyStatus[j].for.getTime() > recentTime){
-                            recentTime = allTracks[i].monthlyStatus[j].for.getTime();
-                            recentDate = allTracks[i].monthlyStatus[j].for;
+                        let rt = new Date(allTracks[i].monthlyStatus[j].for).getTime();
+                        if(rt > recentTime){
+                            recentTime = rt;
+                            recentDate = new Date(allTracks[i].monthlyStatus[j].for);
                         }
                     }
 
                     for(let j = 0; j < allTracks[i].monthlyStatus.length; j++){
-                        if(allTracks[i].monthlyStatus[j].for == recentDate){
+                        let rd = new Date(allTracks[i].monthlyStatus[j].for);
+                        if(rd == recentDate){
                             prevCount = allTracks[i].monthlyStatus[j].count;
                         }
                     }
