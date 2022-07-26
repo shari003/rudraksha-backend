@@ -17,11 +17,12 @@ const empTrackSchema = new mongoose.Schema({
     targetDeployment: {
         type: Number,
         default: 21
-    },
+    }, 
     count: {
         type: Number,
         default: 0,
     },
+    monthlyStatus: [Object],
     deployedYearly: {
         type: Number,
         default: 0

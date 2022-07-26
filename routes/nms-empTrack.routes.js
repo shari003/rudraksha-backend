@@ -63,16 +63,53 @@ schedule.scheduleJob("0 0 * * *", async () => {
             // if we move to next month
             // 6(July) < 7(August)
             if(allTracks[i].currentDate.getMonth() < todayMonth.getMonth()){
+                // for saving in monthly
+                const oldDate = allTracks[i].currentDate;
+                let recentDate = null;
+                let newCount = allTracks[i].count; // total count till last month
+                let prevCount = 0;
                 
-                // The Current Date in DB gets updated - Month by +1
-                // const newCurrentDate = todayMonth.setMonth(todayMonth.getMonth());
+                // -> The Current Date in DB gets updated - Month by +1
+                // -> const newCurrentDate = todayMonth.setMonth(todayMonth.getMonth());
+                // -> suppose Today is 01/08/2022 and existing date(currentDate) is 31/07/2022, newCurrentDate becomes 
+                // ... currentDate.getMonth() + 1   i.e. 07+01 = 08 and currentDate becomes on updating --> 01/08/2022
                 const newCurrentDate = todayMonth.setMonth(allTracks[i].currentDate.getMonth() + 1);
                 
                 // Employee's target is increased by 21
                 const newDeployments = allTracks[i].targetDeployment + 21;
                 
                 // Employee's Track is updated 
-                const allTracksOne = await empTrackModel.findOneAndUpdate({_id: allTracks[i]._id}, {currentDate: newCurrentDate, targetDeployment: newDeployments}, {new: true, runValidators: true});
+                if(allTracks[i].monthlyStatus.length === 0){
+                    const allTracksOne = await empTrackModel.findOneAndUpdate({_id: allTracks[i]._id}, {
+                        currentDate: newCurrentDate,
+                        targetDeployment: newDeployments, 
+                        monthlyStatus: [...allTracks[i].monthlyStatus, {"for": oldDate, "count": newCount}] 
+                    }, {new: true, runValidators: true});
+
+                } else {
+
+                    let recentTime = allTracks[i].monthlyStatus[0].for.getTime();
+
+                    for(let j = 1; i < allTracks[i].monthlyStatus.length; j++){
+                        if(allTracks[i].monthlyStatus[j].for.getTime() > recentTime){
+                            recentTime = allTracks[i].monthlyStatus[j].for.getTime();
+                            recentDate = allTracks[i].monthlyStatus[j].for;
+                        }
+                    }
+
+                    for(let j = 0; j < allTracks[i].monthlyStatus.length; j++){
+                        if(allTracks[i].monthlyStatus[j].for == recentDate){
+                            prevCount = allTracks[i].monthlyStatus[j].count;
+                        }
+                    }
+
+                    const allTracksOne = await empTrackModel.findOneAndUpdate({_id: allTracks[i]._id}, {
+                        currentDate: newCurrentDate,
+                        targetDeployment: newDeployments, 
+                        monthlyStatus: [...allTracks[i].monthlyStatus, {"for": oldDate, "count": (newCount - prevCount)}] 
+                    }, {new: true, runValidators: true});
+                }
+                
             }
             
             // If new year starts, the Employee starts with new Target of Deployments
@@ -84,7 +121,13 @@ schedule.scheduleJob("0 0 * * *", async () => {
                 totalDeployments += allTracks[i].count;
 
                 // Updating the target once again with 21, count with 0, and deployedYearly with above variable
-                const allTracksOne = await empTrackModel.findOneAndUpdate({_id: allTracks[i]._id}, {currentDate: todayMonth, targetDeployment: 21, deployedYearly: totalDeployments, count: 0}, {new: true, runValidators: true});
+                const allTracksOne = await empTrackModel.findOneAndUpdate({_id: allTracks[i]._id}, {
+                    currentDate: todayMonth, 
+                    targetDeployment: 21, 
+                    deployedYearly: totalDeployments, 
+                    count: 0,
+                    monthlyStatus: []
+                }, {new: true, runValidators: true});
             }
 
         }
