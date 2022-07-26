@@ -1,5 +1,9 @@
 const mongoose = require("mongoose");
 
+// const monthSchema = new mongoose.Schema({
+
+// })
+
 const empTrackSchema = new mongoose.Schema({
     empId: {
         type: mongoose.Types.ObjectId,
@@ -11,7 +15,7 @@ const empTrackSchema = new mongoose.Schema({
     //     require: true,
     // },
     currentDate: { // starting would be the DOJ from Employee master table itself
-        type: true,
+        type: Date,
         required: [true, "Please Enter the Current Date !!"],
     },
     targetDeployment: {
@@ -22,7 +26,7 @@ const empTrackSchema = new mongoose.Schema({
         type: Number,
         default: 0,
     },
-    monthlyStatus: [Object],
+    monthlyStatus: [{for: Date, count: Number}],
     deployedYearly: {
         type: Number,
         default: 0

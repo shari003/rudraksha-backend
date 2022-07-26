@@ -65,8 +65,7 @@ schedule.scheduleJob("0 0 * * *", async () => {
             if(allTracks[i].currentDate.getMonth() < todayMonth.getMonth()){
                 // for saving in monthly
                 const oldDate = allTracks[i].currentDate;
-                let recentDate = null;
-                let newCount = allTracks[i].count; // total count till last month
+                let latestCount = allTracks[i].count; // total count till last month
                 let prevCount = 0;
                 
                 // -> The Current Date in DB gets updated - Month by +1
@@ -81,34 +80,31 @@ schedule.scheduleJob("0 0 * * *", async () => {
                 // Employee's Track is updated 
                 if(allTracks[i].monthlyStatus.length === 0){
                     const allTracksOne = await empTrackModel.findOneAndUpdate({_id: allTracks[i]._id}, {
+                        monthlyStatus: [...allTracks[i].monthlyStatus, {"for": oldDate, "count": latestCount}],
                         currentDate: newCurrentDate,
                         targetDeployment: newDeployments, 
-                        monthlyStatus: [...allTracks[i].monthlyStatus, {"for": oldDate, "count": newCount}] 
                     }, {new: true, runValidators: true});
 
                 } else {
  
-                    let recentTime = new Date(allTracks[i].monthlyStatus[0].for).getTime();
+                    let maxTime = allTracks[i].monthlyStatus[0].for.getTime();
 
-                    for(let j = 1; i < allTracks[i].monthlyStatus.length; j++){
-                        let rt = new Date(allTracks[i].monthlyStatus[j].for).getTime();
-                        if(rt > recentTime){
-                            recentTime = rt;
-                            recentDate = new Date(allTracks[i].monthlyStatus[j].for);
+                    for(let j = 1; j < allTracks[i].monthlyStatus.length; j++){
+                        if(allTracks[i].monthlyStatus[j].for.getTime() > maxTime){
+                            maxTime = allTracks[i].monthlyStatus[j].for.getTime();
                         }
                     }
 
                     for(let j = 0; j < allTracks[i].monthlyStatus.length; j++){
-                        let rd = new Date(allTracks[i].monthlyStatus[j].for);
-                        if(rd == recentDate){
-                            prevCount = allTracks[i].monthlyStatus[j].count;
+                        if(allTracks[i].monthlyStatus[j].for.getTime() <= maxTime){
+                            prevCount += allTracks[i].monthlyStatus[j].count;
                         }
                     }
 
                     const allTracksOne = await empTrackModel.findOneAndUpdate({_id: allTracks[i]._id}, {
+                        monthlyStatus: [...allTracks[i].monthlyStatus, {"for": oldDate, "count": (latestCount - prevCount)}], 
                         currentDate: newCurrentDate,
                         targetDeployment: newDeployments, 
-                        monthlyStatus: [...allTracks[i].monthlyStatus, {"for": oldDate, "count": (newCount - prevCount)}] 
                     }, {new: true, runValidators: true});
                 }
                 
@@ -170,7 +166,7 @@ router.get("/countTracker", async(req, res) => {
             message: "Something Went Wrong !!"
         });
     }
-})
+});
 
 router.post("/add-NMS-Volunteers", async(req, res) => {
     const {volEmail, volName, volDob, empId, volNumber, volAddress, volStartDate, volEndDate, volProfession, volProjectHead, volProjectName, remarks} = req.body;
@@ -227,6 +223,6 @@ router.post("/add-NMS-Volunteers", async(req, res) => {
             message: "Something Went Wrong !!"
         });
     }
-})
+});
 
 module.exports = router;
