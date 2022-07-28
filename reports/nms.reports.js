@@ -6,12 +6,15 @@ const {onlyAdmin} = require("../middlewares/auth");
 const trackModel = require("../models/nms-empTrack.model");
 const volModel = require("../models/nms-volunteers.model");
 
-router.post("reports-monthly-nms", async(req, res) => {
+router.post("/reports-monthly-nms", async(req, res) => {
     const {empId, month, year} = req.body;
     try{
         const oneEmp = await trackModel.findOne({empId: empId});
         const volunteers = await volModel.find({empId: empId});
-        let mnth = '';
+        const nowDate = new Date(Number(year), Number(month), 1);
+        let mnth = nowDate.toLocaleString('default', { month: 'long' });
+        console.log(mnth);
+        let count = 0;
         if(!oneEmp) throw new Error("No Track Record Exists for Employee with ID: " + empId);
         let final = [];
         let vols = [];
@@ -28,29 +31,22 @@ router.post("reports-monthly-nms", async(req, res) => {
             for(let i = 0; i < oneEmp.monthlyStatus.length; i++){
                 if(oneEmp.monthlyStatus[i].for.getMonth() === Number(month) && oneEmp.monthlyStatus[i].for.getFullYear() === Number(year)){
                     mnth = oneEmp.monthlyStatus[i].for.toLocaleString('default', { month: 'long' });
-                    final.push({label: mnth, value: oneEmp.monthlyStatus[i].count, color: "#D61C4E"});
-    
-                    res.status(200).json({
-                        success: true,
-                        data: {
-                            final,
-                            vols
-                        },
-                        message: "Data Fetched for month: " + mnth + " ,for ID: " + empId
-                    });
-    
-                    return -1;
+                    count = oneEmp.monthlyStatus[i].count;
                 
-                } else {
-                    res.status(200).json({
-                        success: true,
-                        data: "No Records Found for the month: " + (Number(month) + 1),
-                        message: "Please try again with different Month !!"
-                    });
-                    return -1;
                 }
             }
         }
+
+        final.push({label: mnth, value: count, color: "#D61C4E"});
+
+        res.status(200).json({
+            success: true,
+            data: {
+                final,
+                vols
+            },
+            message: "Data Fetched for month: " + mnth + " ,for ID: " + empId
+        });
 
     }catch(e){
         res.status(500).json({
@@ -61,7 +57,7 @@ router.post("reports-monthly-nms", async(req, res) => {
     }
 });
 
-router.post("reports-quarterly-nms", async(req, res) => {
+router.post("/reports-quarterly-nms", async(req, res) => {
     const {quarter, empId, year} = req.body;
 
     const quarter0 = {
@@ -232,7 +228,7 @@ router.post("reports-quarterly-nms", async(req, res) => {
     }
 });
 
-router.post("reports-halfYearly-nms", async(req, res) => {
+router.post("/reports-halfYearly-nms", async(req, res) => {
     const {half, empId, year} = req.body;
 
     const half0 = {
@@ -362,7 +358,7 @@ router.post("reports-halfYearly-nms", async(req, res) => {
     }
 });
 
-router.post("reports-yearly-nms", async(req, res) => {
+router.post("/reports-yearly-nms", async(req, res) => {
     const {empId, year} = req.body;
     try{
         const oneEmp = await trackModel.findOne({empId: empId});

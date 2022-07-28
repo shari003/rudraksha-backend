@@ -6,7 +6,7 @@ const _ = require("lodash");
 const sharp = require("sharp");
 
 // Auth Middlewares
-const {onlyAdmin} = require("../middlewares/auth");
+const {onlyAdmin, authentication} = require("../middlewares/auth");
 
 // Models
 const empTrackModel = require("../models/nms-empTrack.model");
@@ -134,7 +134,7 @@ schedule.scheduleJob("0 0 * * *", async () => {
 
 // job.start();
 
-router.get("/countTracker", async(req, res) => {
+router.get("/countTracker", authentication, async(req, res) => {
     try{
         const allTracks = await empTrackModel.find();
         let dat = [];
@@ -168,13 +168,13 @@ router.get("/countTracker", async(req, res) => {
     }
 });
 
-router.post("/add-NMS-Volunteers", async(req, res) => {
-    const {volEmail, volName, volDob, empId, volNumber, volAddress, volStartDate, volEndDate, volProfession, volProjectHead, volProjectName, remarks} = req.body;
+router.post("/add-NMS-Volunteers", authentication, async(req, res) => {
+    const {volEmail, volName, volBlood, volDob, empId, volNumber, volAddress, volStartDate, volunteership, volProfession, volProjectHead, volProjectName, remarks} = req.body;
 
     const fullName = _.startCase(volName);
     try {
 
-        // if(!vo`lEmail || !volName || !volDob || !empId || !volNumber || !volAddress || !volStartDate || !volEndDate || !volProfession || !volProjectHead || !volProjectName || !remarks){
+        // if(!volEmail || !volName || !volDob || !empId || !volNumber || !volAddress || !volStartDate || !volEndDate || !volProfession || !volProjectHead || !volProjectName || !remarks){
         //     throw new Error("Please Enter the required fields !!");
         // }`
 
@@ -192,8 +192,9 @@ router.post("/add-NMS-Volunteers", async(req, res) => {
             empId,
             volNumber,
             volAddress,
+            volBlood,
             volStartDate,
-            volEndDate,
+            volunteership,
             volProfession,
             volProjectHead,
             volProjectName,
@@ -214,6 +215,111 @@ router.post("/add-NMS-Volunteers", async(req, res) => {
             },
             message: "New Volunteer was added to the DB and the count tracker for Employee's: '" + req.body.empId + "' by 1."
         });
+
+    }catch(e){
+        console.log(e);
+        res.status(500).json({
+            success: false,
+            data: "Something Went Wrong !!",
+            message: "Something Went Wrong !!"
+        });
+    }
+});
+
+router.post("/getVolunteers-ondemand", onlyAdmin, async(req, res) => {
+    let {date1} = req.body;
+    const dt = new Date(date1);
+    // console.log(dt);
+    try{
+        let vols = [];
+        const volunteers = await volunteerNMSModel.find();
+        if(volunteers.length > 0){
+            for(let i = 0; i < volunteers.length; i++){
+                if(volunteers[i].volunteership.getTime() === dt.getTime()){
+                    vols.push(volunteers[i]);
+                }
+            }
+        }
+
+        res.status(200).json({
+            success: true,
+            data: vols,
+            message: "Your Data is ready !!"
+        });
+
+    }catch(e){
+        console.log(e);
+        res.status(500).json({
+            success: false,
+            data: "Something Went Wrong !!",
+            message: "Something Went Wrong !!"
+        });
+    }
+});
+
+router.post("/acknowledgeVolunteers", onlyAdmin, async(req, res) => {
+    const {approve, volId} = req.body;
+    try{
+        const vol = await volunteerNMSModel.findOne({_id: volId});
+        if(!vol) throw new Error("No Volunteer with that ID !!");
+
+        const empRecruiter = await empTrackModel.findOne({empId: vol.empId});
+        if(!empRecruiter) throw new Error("No Employee Tracker with that ID !!");
+
+
+        if(Number(approve)){
+            // If approved by Admin.
+            const volUpdate = await volunteerNMSModel.findOneAndUpdate({_id: vol._id}, {isActive: true}, {new: true, runValidators: true});
+
+            res.status(200).json({
+                success: true,
+                data: `Volunteer: ${vol.volName} is 'approved', who is recruited by ${empRecruiter.empId} !!`,
+                message: "isActive updated with True (default)!!"
+            });
+
+        } else {
+            // console.log("Noo");
+            const volUpdate = await volunteerNMSModel.findOneAndUpdate({_id: vol._id}, {isActive: false}, {new: true, runValidators: true});
+            const updateRecruiter = await empTrackModel.findOneAndUpdate({empId: empRecruiter.empId}, {$inc: {count: -1}}, {new: true, runValidators: true});
+
+            res.status(200).json({
+                success: true,
+                data: `Volunteer: ${vol.volName} is 'not approved', who is recruited by ${empRecruiter.empId} !!`,
+                message: "isActive updated with False !!"
+            });
+
+        }
+    }catch(e){
+        console.log(e);
+        res.status(500).json({
+            success: false,
+            data: "Something Went Wrong !!",
+            message: "Something Went Wrong !!"
+        });
+    }
+});
+
+router.post("/activeVolunteer", onlyAdmin, async(req, res) => {
+    const {volId} = req.body;
+    try{
+        const volunteer = await volunteerNMSModel.findOne({_id: volId});
+        if(!volunteer) throw new Error("No Volunteers with ID: " + volId);
+
+        if(volunteer.isActive){
+            res.status(200).json({
+                success: true,
+                data: volunteer,
+                message: `The Volunteer with ID: ${volId} is already ACTIVE`
+            });
+        } else {
+            const volUpdate = await volunteerNMSModel.findOneAndUpdate({_id: volId}, {isActive: true}, {new: true, runValidators: true});
+            const updateRecruiter = await empTrackModel.findOneAndUpdate({empId: volunteer.empId}, {$inc: {count: 1}}, {new: true, runValidators: true});
+            res.status(200).json({
+                success: true,
+                data: volUpdate,
+                message: `The Volunteer with ID: ${volId} is now ACTIVE !!`
+            });
+        }
 
     }catch(e){
         console.log(e);

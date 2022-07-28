@@ -158,6 +158,7 @@ const getAllEmployees = async (req, res, next) => {
         experience: 0,
         // email: 0,
         // phone: 0,
+        password: 0,
         Dob: 0,
         mothername: 0,
         fathername: 0,

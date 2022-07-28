@@ -28,6 +28,9 @@ const volunteerNMSchema = new mongoose.Schema({
         type: String,
         required: [true, "Please provide your Phone Number !"]
     },
+    volBlood:{
+        type: String,
+    },
     volAddress: {
         type: String,
         required: [true, "Please provide your full address !"]
@@ -36,7 +39,7 @@ const volunteerNMSchema = new mongoose.Schema({
         type: Date,
         required: [true, "Please provide the Starting Date !!"]
     },
-    volEndDate: {
+    volunteership: {
         type: Date,
         required: [true, "Please provide the Ending Date !!"]
     },
@@ -55,6 +58,10 @@ const volunteerNMSchema = new mongoose.Schema({
         type: String,
         maxlength: [300, "Word Limit should not exceed 300 words !!"],
         minlength: [5, "Minimum Word Limit is 5 !!"]
+    },
+    isActive:{
+        type: Boolean,
+        default: true
     }
 
 });
