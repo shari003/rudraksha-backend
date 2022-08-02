@@ -42,6 +42,7 @@ app.use("/api/nms", require("./routes/nms-empTrack.routes"));
 // reports apis
 app.use("/api/reports", require("./reports/employeeDetails"));
 app.use("/api/reports", require("./reports/ivms.reports"));
+app.use("/api/reports", require("./reports/nms.reports"));
 
 const ConnectDB = require("./database/connection");
 //connection to db

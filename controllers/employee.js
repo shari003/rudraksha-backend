@@ -2,6 +2,8 @@ const Employee = require("../models/employee");
 const Attendance = require("../models/attendance");
 const Lms = require("../models/Lms");
 const empTrackModel = require("../models/nms-empTrack.model");
+const digitalSaleModel = require("../models/salesDIGITAL.model");
+const fncgSalesModel = require("../models/salesFNCG.model");
 
 const schedule = require("node-schedule");
 const fs = require("fs");
@@ -51,8 +53,25 @@ const AddEmployee = async (req, res, next) => {
 
     const saveTracker = await newTracker.save();
     console.log(saveTracker);
-    /////////////////////////////////////////////////////////
 
+    /////////////////////////////////////////////////////////
+    // creating a sales instance for each employee
+    const digital = new digitalSaleModel({
+      empId: emp._id,
+      currentDate: doj
+    });
+
+    const saveDigital = await digital.save();
+    console.log(saveDigital);
+
+    const fncg = new fncgSalesModel({
+      empId: emp._id,
+      currentDate: doj,
+    });
+
+    const savefncg = await fncg.save();
+    console.log(savefncg);
+    /////////////////////////////////////////////////////////
     // creating a lms instance for each employee
     const remCausalLeaves = 12 - (doj.getMonth() + 1);
     const lms = new Lms({
