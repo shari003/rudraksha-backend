@@ -13,7 +13,7 @@ router.post("/reports-monthly-nms", async(req, res) => {
         const volunteers = await volModel.find({empId: empId, isActive: true});
         const nowDate = new Date(Number(year), Number(month), 1);
         let mnth = nowDate.toLocaleString('default', { month: 'long' });
-        console.log(mnth);
+        // console.log(mnth);
         let count = 0;
         if(!oneEmp) throw new Error("No Track Record Exists for Employee with ID: " + empId);
         let final = [];

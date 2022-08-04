@@ -113,7 +113,7 @@ schedule.scheduleJob("0 0 * * *", async () => {
 
 }); 
 
-// job.start();
+// GET REQUESTS
  
 router.get("/countTracker", async(req, res) => {
     try{
@@ -148,6 +148,67 @@ router.get("/countTracker", async(req, res) => {
         });
     }
 });
+
+router.get("/donationTracker", async(req, res) => {
+    let dat = [];
+    try{
+        const allTracks = await empTrackModel.find();
+        if(allTracks.length > 0){
+            for(let i = 0; i < allTracks.length; i++){
+                dat.push({empId: allTracks[i].empId, target: allTracks[i].donationTarget, count: allTracks[i].donationTillNow});
+            }
+            res.status(200).json({
+                success: true,
+                data: dat,
+                message: "Fetched All the Track Records of NMS of Employees."
+            });
+            return -1;
+        } else {
+            res.status(400).json({
+                success: true,
+                data: "No Tracker Records Found !!",
+                message: "Please Try Again !!"
+            });
+            return -1;
+        }
+    }catch(e){
+        console.log(e);
+        res.status(500).json({
+            success: false,
+            data: "Something Went Wrong !!",
+            message: "Something Went Wrong !!"
+        });
+    }
+});
+
+router.get("/allVolunteers", authentication, async(req, res) => {
+    try{
+        const allVolunteers = await volunteerNMSModel.find();
+        if(allVolunteers.length > 0){
+            res.status(200).json({
+                success: true,
+                data: allVolunteers,
+                message: "All Volunteers Data fetched !!"
+            });
+            return -1;
+        } else {
+            res.status(200).json({
+                success: true,
+                data: [],
+                message: "No Records found for Volunteers in NMS !!"
+            });
+        }
+    }catch(e){
+        console.log(e);
+        res.status(500).json({
+            success: false,
+            data: "Something Went Wrong !!",
+            message: "Something Went Wrong !!"
+        });
+    }
+});
+
+// POST REQUESTS
 
 router.post("/add-NMS-Volunteers", authentication, async(req, res) => {
     let {volEmail, volName, volBlood, volDob, empId, volNumber, volAddress, volStartDate, volunteership, volProfession, volProjectHead, volProjectName, remarks, isDonor, donationAmt, donationDate, orderId} = req.body;
@@ -320,33 +381,6 @@ router.post("/activeVolunteer", onlyAdmin, async(req, res) => {
     }
 });
 
-router.get("/allVolunteers", authentication, async(req, res) => {
-    try{
-        const allVolunteers = await volunteerNMSModel.find();
-        if(allVolunteers.length > 0){
-            res.status(200).json({
-                success: true,
-                data: allVolunteers,
-                message: "All Volunteers Data fetched !!"
-            });
-            return -1;
-        } else {
-            res.status(200).json({
-                success: true,
-                data: [],
-                message: "No Records found for Volunteers in NMS !!"
-            });
-        }
-    }catch(e){
-        console.log(e);
-        res.status(500).json({
-            success: false,
-            data: "Something Went Wrong !!",
-            message: "Something Went Wrong !!"
-        });
-    }
-});
-
 router.post("/donate", authentication, async(req, res) => {
     const {volId, amt, donDate, orderId} = req.body;
     try{
@@ -383,38 +417,6 @@ router.post("/donate", authentication, async(req, res) => {
             message: "Volunteer Updated with ID: " + volId
         });
 
-    }catch(e){
-        console.log(e);
-        res.status(500).json({
-            success: false,
-            data: "Something Went Wrong !!",
-            message: "Something Went Wrong !!"
-        });
-    }
-});
-
-router.get("/donationTracker", async(req, res) => {
-    let dat = [];
-    try{
-        const allTracks = await empTrackModel.find();
-        if(allTracks.length > 0){
-            for(let i = 0; i < allTracks.length; i++){
-                dat.push({empId: allTracks[i].empId, target: allTracks[i].donationTarget, count: allTracks[i].donationTillNow});
-            }
-            res.status(200).json({
-                success: true,
-                data: dat,
-                message: "Fetched All the Track Records of NMS of Employees."
-            });
-            return -1;
-        } else {
-            res.status(400).json({
-                success: true,
-                data: "No Tracker Records Found !!",
-                message: "Please Try Again !!"
-            });
-            return -1;
-        }
     }catch(e){
         console.log(e);
         res.status(500).json({

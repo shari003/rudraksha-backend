@@ -38,11 +38,14 @@ app.use("/api/lms", leaveRoutes);
 //http://localhost:5000/api/employees/getEmployees
 app.use("/api/ivms", require("./routes/ivms.routes"));
 app.use("/api/nms", require("./routes/nms-empTrack.routes"));
+app.use("/api/salesms", require("./routes/salesMS.routes"));
 
 // reports apis
 app.use("/api/reports", require("./reports/employeeDetails"));
 app.use("/api/reports", require("./reports/ivms.reports"));
 app.use("/api/reports", require("./reports/nms.reports"));
+app.use("/api/reports", require("./reports/donation.reports"));
+app.use("/api/reports", require("./reports/sales.reports"));
 
 const ConnectDB = require("./database/connection");
 //connection to db
