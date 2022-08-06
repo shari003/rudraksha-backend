@@ -171,4 +171,41 @@ router.post("/reports-yearly-dms", async(req, res) => {
     }
 });
 
+router.post("/getDonors", async(req, res) => {
+    const {phn} = req.body;
+    try{
+        const docs = await nmsVolunteers.findOne({volNumber: phn});
+
+        if(!docs){
+            res.status(400).json({
+                success: false,
+                data: "No Phone Number found in Volunteer List !!",
+                message: "Please try with different Phone Number !!"
+            });
+            return -1;
+        }
+
+        let minDetails = {
+            "NAME": docs.volName,
+            "EMAIL": docs.volEmail,
+            "PHONE": docs.volNumber
+        }
+
+        let donationStatus = docs.donationStatus;
+
+        res.status(200).json({
+            success: true,
+            data: { minDetails, donationStatus },
+            message: "Fetched !!"
+        });
+    }catch(e){
+        console.log(e);
+        res.status(500).json({
+            success: false,
+            data: "Somethin went wrong !",
+            message: "Somethin went wrong !"
+        });
+    }
+});
+
 module.exports = router;
