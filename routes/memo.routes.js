@@ -5,6 +5,26 @@ const {onlyAdmin, authentication} = require("../middlewares/auth");
 
 const memoModel = require("../models/memo.model");
 
+// Scheduler
+//totalMemoYearly
+
+schedule.scheduleJob("0 0 * * *", async() => {
+    const todayDate = new Date();
+    try{
+        const memo = await memoModel.find();
+        if(memo.length > 0){
+            for(let i = 0; i < memo.length; i++){
+                if(memo[i].currentDate.getMonth() > todayDate.getMonth()){
+                    const updateMemo = await memoModel.findOneAndUpdate({_id: memo[i]._id}, {$inc: {totalMemoYearly: memo[i].memoCount}, memoCount: 0, currentDate: todayDate}, {new: true, runValidators: true});
+                }
+            }
+        }
+
+    }catch(e){
+        console.log(e);
+    }
+
+});
 
 router.get("/getMemoCount", async(req, res) => {
     try{

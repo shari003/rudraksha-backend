@@ -30,6 +30,10 @@ const memoSchema = new mongoose.Schema({
     remarks: {
         type: String,
         default: null
+    },
+    totalMemoYearly: {
+        type: Number,
+        default: 0
     }
 }, {timestamps: true});
 

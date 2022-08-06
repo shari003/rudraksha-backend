@@ -47,6 +47,7 @@ app.use("/api/reports", require("./reports/ivms.reports"));
 app.use("/api/reports", require("./reports/nms.reports"));
 app.use("/api/reports", require("./reports/donation.reports"));
 app.use("/api/reports", require("./reports/sales.reports"));
+app.use("/api/reports", require("./reports/pms.reports"));
 
 const ConnectDB = require("./database/connection");
 //connection to db
