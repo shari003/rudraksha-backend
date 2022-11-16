@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const schedule = require("node-schedule");
+const schedule = require("node-schedule"); 
 const _ = require("lodash");
 
 // Auth Middlewares
@@ -11,6 +11,7 @@ const empTrackModel = require("../models/nms-empTrack.model");
 const volunteerNMSModel = require("../models/nms-volunteers.model");
 
 // Cron Scheduler - Checks Everyday at 12:00 AM 
+// * * * * *
 schedule.scheduleJob("0 0 * * *", async () => {
     // Do whatever you want in here. Send email, Make  database backup or download data.
     const allTracks = await empTrackModel.find();
@@ -20,7 +21,7 @@ schedule.scheduleJob("0 0 * * *", async () => {
         for(let i = 0; i < allTracks.length; i++){
             
             // if we move to next month
-            // 6(July) < 7(August)
+            // 6(July) < 7(August) 8  <  9
             if(allTracks[i].currentDate.getMonth() < todayMonth.getMonth()){
                 // for saving in monthly
                 const oldDate = allTracks[i].currentDate;

@@ -6,7 +6,7 @@ const { adminAccess, onlyAdmin } = require("../middlewares/auth");
 //this route creates the password using empId (can be created only by admins)
 router.post(
   "/createEmployeeCredentials",
-  onlyAdmin,
+  // onlyAdmin,
   createEmployeeCredentials
 );
 
